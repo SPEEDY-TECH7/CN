@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_INSTRUCTION_LENGTH 100
+
+// Function to generate machine code for a given intermediate instruction
+void generate_machine_code(char *intermediate_code) {
+    char var1[20], var2[20], result[20];
+    char operation[10];
+    
+    // Check if the line is an assignment (e.g., a = b + c)
+    if (strchr(intermediate_code, '=')) {
+        // Split the instruction at '='
+        sscanf(intermediate_code, "%s = %s %s %s", result, var1, operation, var2);
+
+        // Handle different operations
+        if (strcmp(operation, "+") == 0) {
+            printf("MOV R1, %s\n", var1);       // Load var1 into R1
+            printf("ADD R1, %s\n", var2);       // Add var2 to R1
+            printf("MOV %s, R1\n", result);    // Store the result in the memory location of 'result'
+        }
+        else if (strcmp(operation, "-") == 0) {
+            printf("MOV R1, %s\n", var1);       // Load var1 into R1
+            printf("SUB R1, %s\n", var2);       // Subtract var2 from R1
+            printf("MOV %s, R1\n", result);    // Store the result in the memory location of 'result'
+        }
+        else if (strcmp(operation, "*") == 0) {
+            printf("MOV R1, %s\n", var1);       // Load var1 into R1
+            printf("MUL R1, %s\n", var2);       // Multiply R1 by var2
+            printf("MOV %s, R1\n", result);    // Store the result in the memory location of 'result'
+        }
+    }
+    // Handle conditional jump (e.g., if d > 10 goto label1)
+    else if (strstr(intermediate_code, "if")) {
+        char var[20], condition[10], value[10], label[20];
+        // Split the instruction at 'if'
+        sscanf(intermediate_code, "if %s %s %s goto %s", var, condition, value, label);
+        
+        if (strcmp(condition, ">") == 0) {
+            printf("MOV R1, %s\n", var);           // Load the variable into R1
+            printf("CMP R1, %s\n", value);        // Compare R1 with the value
+            printf("JGT %s\n", label);            // Jump to label if R1 > value
+        }
+    }
+}
+
+int main() {
+    char intermediate_code[MAX_INSTRUCTION_LENGTH];
+    
+    // Sample input: Intermediate code instructions
+    printf("Enter intermediate code (end with 'exit' to stop):\n");
+    
+    // Reading intermediate code from user input
+    while (1) {
+        // Read a line of intermediate code
+        printf("> ");
+        fgets(intermediate_code, MAX_INSTRUCTION_LENGTH, stdin);
+        intermediate_code[strcspn(intermediate_code, "\n")] = 0; // Remove newline character
+
+        // If the user inputs "exit", break the loop
+        if (strcmp(intermediate_code, "exit") == 0) {
+            break;
+        }
+
+        // Generate the machine code for the current instruction
+        generate_machine_code(intermediate_code);
+    }
+
+    return 0;
+}
